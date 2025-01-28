@@ -27,4 +27,13 @@ app.options('*', cors()); // Allow preflight requests for all routes
 require('./config')(app);
 
 // 👇 Start handling routes
-const indexRoutes = requi
+const indexRoutes = require('./routes/index.routes');
+app.use('/api', indexRoutes);
+
+const authRoutes = require('./routes/auth.routes');
+app.use('/auth', authRoutes);
+
+// ❗ Handle errors
+require('./error-handling')(app);
+
+module.exports = app;
