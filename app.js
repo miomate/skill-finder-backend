@@ -1,38 +1,30 @@
-//my code
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10); 
 const hash = bcrypt.hashSync("password", salt);
-//my code end
-
-
-
-
-
-
-
-
 
 // ℹ️ Gets access to environment variables/settings
-// https://www.npmjs.com/package/dotenv
-require('dotenv').config()
+require('dotenv').config();
 
-// Handles http requests (express is node js framework)
-// https://www.npmjs.com/package/express
-const express = require('express')
+// Handles HTTP requests
+const express = require('express');
+const cors = require('cors');
 
-const app = express()
+const app = express();
 
-// ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
-require('./config')(app)
+// ℹ️ Configure CORS
+const allowedOrigins = ['https://glittery-empanada-71e129.netlify.app']; // Your Netlify frontend URL
 
-// 👇 Start handling routes here
-const indexRoutes = require('./routes/index.routes')
-app.use('/api', indexRoutes)
+app.use(cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS
+    credentials: true
+}));
 
-const authRoutes = require('./routes/auth.routes')
-app.use('/auth', authRoutes)
+// Handle preflight requests
+app.options('*', cors()); // Allow preflight requests for all routes
 
-// ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
-require('./error-handling')(app)
+// ℹ️ Load middleware configurations
+require('./config')(app);
 
-module.exports = app
+// 👇 Start handling routes
+const indexRoutes = requi
