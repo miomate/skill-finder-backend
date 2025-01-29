@@ -33,6 +33,10 @@ app.use('/api', indexRoutes);
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
+const skillRoutes = require("./routes/skills.routes");
+app.use("/api/skills", skillRoutes);
+
+
 // ❗ Handle errors
 require('./error-handling')(app);
 
