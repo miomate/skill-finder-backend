@@ -7,7 +7,6 @@ const citySchema = new Schema(
       type: String,
       required: true,
       lowercase: true,
-      required: true,
       unique: true,
       trim: true,
     },

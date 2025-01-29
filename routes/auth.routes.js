@@ -36,13 +36,12 @@ router.post("/login", async (req, res, next) => {
           userId: potentialUser._id,
         };
         const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
-          algortihm: "HS256",
+          algorithm: "HS256",
           expiresIn: "6h",
         });
 
         res.json({token: authToken});
 
-        res.status(200).json({ message: "Welcome" });
       } else {
         res.status(403).json({ message: "Incorrect password" });
       }

@@ -15,8 +15,8 @@ const withDB = async serverListener => {
       serverListener()
     }
   } catch (error) {
-    console.error('Error connecting to mongo: ', err)
-  }
+    console.error('Error connecting to mongo: ', error)
+}
 }
 
 module.exports = withDB
