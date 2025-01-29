@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
+const user = require("./User.model");
+const city = require("./City.model");
 
-// TODO: Please make sure you edit the skill model to whatever makes sense in this case
 const skillSchema = new Schema(
   {
     skill: {
@@ -10,13 +11,22 @@ const skillSchema = new Schema(
       unique: true,
       trim: true,
     },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    city: {
+      type: Schema.Types.ObjectId,
+      ref: "City",
+      required: true,
+    },
   },
   {
-    // this second object adds extra properties: `createdAt` and `updatedAt`
     timestamps: true,
   }
 );
 
-const skill = model("skill", skillSchema);
+const skill = model("Skill", skillSchema);
 
 module.exports = skill;
