@@ -1,57 +1,96 @@
+// skills.routes.js
 const express = require("express");
 const router = express.Router();
 const Skill = require("../models/Skill.model");
-const User = require("../models/User.model"); // Assuming user model is needed for validation
+const City = require("../models/City.model");
+const User = require("../models/User.model");
 
 // POST route to create a skill
 router.post("/", async (req, res) => {
-  const { skill, city, userId } = req.body;
-
-  // Ensure that userId exists
-  if (!userId) {
-    return res.status(400).json({ message: "User ID is required" });
-  }
-
   try {
-    // Check if user exists
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { skill, user, city } = req.body;
+
+    if (!skill || !user || !city) {
+      return res
+        .status(400)
+        .json({ message: "Skill, user, and city are required." });
     }
 
-    // Check if city exists (or add it if needed)
-    const existingCity = await City.findOne({ name: city });
-    if (!existingCity) {
-      const newCity = new City({ name: city });
-      await newCity.save();
-    }
-
-    // Check if skill already exists for the user in this city
-    const existingSkill = await Skill.findOne({ skill, city, userId });
+    // Check if the skill already exists for the user in the given city
+    const existingSkill = await Skill.findOne({ skill, user, city });
     if (existingSkill) {
       return res
         .status(400)
-        .json({ message: "Skill already exists for this user in this city" });
+        .json({ message: "You already added this skill in this city." });
     }
 
-    // Create and save the skill
-    const newSkill = new Skill({
-      skill,
-      city,
-      userId,
-    });
-
+    // Create the skill if it doesn't exist
+    const newSkill = new Skill({ skill, user, city });
     await newSkill.save();
-    res.status(201).json(newSkill);
-  } catch (error) {
-    console.error("Error creating skill:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to create skill", error: error.message });
+
+    res.status(201).json(newSkill); // Send back the created skill
+  } catch (err) {
+    console.error("Error creating skill:", err);
+    res.status(500).json({ message: "Internal server error." });
   }
 });
 
 module.exports = router;
+
+// const express = require("express");
+// const router = express.Router();
+// const Skill = require("../models/Skill.model");
+// const User = require("../models/User.model"); // Assuming user model is needed for validation
+
+// // POST route to create a skill
+// router.post("/", async (req, res) => {
+//   const { skill, city, userId } = req.body;
+
+//   // Ensure that userId exists
+//   if (!userId) {
+//     return res.status(400).json({ message: "User ID is required" });
+//   }
+
+//   try {
+//     // Check if user exists
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Check if city exists (or add it if needed)
+//     const existingCity = await City.findOne({ name: city });
+//     if (!existingCity) {
+//       const newCity = new City({ name: city });
+//       await newCity.save();
+//     }
+
+//     // Check if skill already exists for the user in this city
+//     const existingSkill = await Skill.findOne({ skill, city, userId });
+//     if (existingSkill) {
+//       return res
+//         .status(400)
+//         .json({ message: "Skill already exists for this user in this city" });
+//     }
+
+//     // Create and save the skill
+//     const newSkill = new Skill({
+//       skill,
+//       city,
+//       userId,
+//     });
+
+//     await newSkill.save();
+//     res.status(201).json(newSkill);
+//   } catch (error) {
+//     console.error("Error creating skill:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Failed to create skill", error: error.message });
+//   }
+// });
+
+// module.exports = router;
 
 // const express = require("express");
 // const Skill = require("../models/Skill.model");
