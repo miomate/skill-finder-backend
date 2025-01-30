@@ -14,14 +14,14 @@ const app = express();
 const allowedOrigins = ['https://glittery-empanada-71e129.netlify.app']; // Your Netlify frontend URL
 
 app.use(cors({
-  origin: allowedOrigins, // Ensure only the correct frontend URL is allowed
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight requests
-  allowedHeaders: ['Content-Type', 'Authorization'], // Add any specific headers you want to allow
-  credentials: true, // Allow cookies/tokens to be sent with requests
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include OPTIONS for preflight
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
+  credentials: true, // Allow cookies and credentials
 }));
 
-// Handle preflight requests (OPTIONS request)
-app.options('*', cors()); // This is a general way to handle preflight requests for all routes
+// Explicitly handle OPTIONS requests for CORS (for preflight)
+app.options('*', cors());
 
 // ℹ️ Load middleware configurations
 require('./config')(app);
@@ -37,8 +37,8 @@ const skillRoutes = require('./routes/skills.routes');
 app.use('/api/skills', skillRoutes);
 
 // Add new routes for users and cities
-const usersRoutes = require('./routes/users.routes'); // Add this
-const citiesRoutes = require('./routes/cities.routes'); // Add this
+const usersRoutes = require('./routes/users.routes');
+const citiesRoutes = require('./routes/cities.routes');
 app.use('/api/users', usersRoutes);
 app.use('/api/cities', citiesRoutes);
 
