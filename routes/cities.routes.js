@@ -1,22 +1,56 @@
 const express = require("express");
 const router = express.Router();
-const City = require("../models/City.model"); // Assuming this is the model for cities
+const City = require("../models/City.model"); // Assuming this is the correct path to your city model
 
 // POST route to create a city
 router.post("/", async (req, res) => {
   const { name } = req.body;
 
+  if (!name) {
+    return res.status(400).json({ message: "City name is required" });
+  }
+
   try {
+    // Check if the city already exists
+    const existingCity = await City.findOne({ name });
+    if (existingCity) {
+      return res.status(400).json({ message: "City already exists" });
+    }
+
+    // Create a new city and save it
     const city = new City({ name });
-    await city.save(); // Save city to the database
-    res.status(201).json(city); // Respond with the city object
+    await city.save(); // This is where we are saving the city to MongoDB
+
+    res.status(201).json(city); // Return the created city
   } catch (error) {
-    console.error("Error creating city:", error);
-    res.status(500).json({ message: "Failed to create city" });
+    console.error("Error creating city:", error); // Log the error for debugging
+    res
+      .status(500)
+      .json({ message: "Failed to create city", error: error.message });
   }
 });
 
 module.exports = router;
+
+// const express = require("express");
+// const router = express.Router();
+// const City = require("../models/City.model"); // Assuming this is the model for cities
+
+// // POST route to create a city
+// router.post("/", async (req, res) => {
+//   const { name } = req.body;
+
+//   try {
+//     const city = new City({ name });
+//     await city.save(); // Save city to the database
+//     res.status(201).json(city); // Respond with the city object
+//   } catch (error) {
+//     console.error("Error creating city:", error);
+//     res.status(500).json({ message: "Failed to create city" });
+//   }
+// });
+
+// module.exports = router;
 
 // // In cities.routes.js
 
