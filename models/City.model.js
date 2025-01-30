@@ -18,6 +18,6 @@ const citySchema = new Schema(
   }
 )
 
-const city = model('city', citySchema)
+const City = mongoose.model("City", citySchema);
 
-module.exports = city
+module.exports = City;

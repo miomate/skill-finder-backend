@@ -23,38 +23,38 @@ router.get("/", async (req, res) => {
     console.log("City found:", cityData); // Log city data if found
     res.status(200).json(cityData);
   } catch (error) {
-    console.error("Error fetching city:", error); // Log the error
-    res.status(500).json({ message: "Server error", error });
+    console.error("Error fetching city:", error.message); // Log the error message
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
 // POST /cities - Add a new city
 router.post("/", async (req, res) => {
-  const { name } = req.body;
+    const { name } = req.body;
 
-  if (!name) {
-    return res.status(400).json({ message: "City name is required" });
-  }
-
-  try {
-    const normalizedCity = name.toLowerCase();
-    console.log("Normalized city name:", normalizedCity); // Log normalized city name
-    let city = await City.findOne({ name: { $regex: `^${normalizedCity}$`, $options: "i" } });
-
-    if (city) {
-      console.log("City already exists:", city); // Log if city already exists
-      return res.status(400).json({ message: "City already exists" });
+    if (!name) {
+      return res.status(400).json({ message: "City name is required" });
     }
 
-    city = new City({ name: normalizedCity });
-    await city.save();
+    try {
+      const normalizedCity = name.toLowerCase();
+      console.log("Checking if city already exists:", normalizedCity); // Log the normalized city name
+      let city = await City.findOne({ name: { $regex: `^${normalizedCity}$`, $options: "i" } });
 
-    console.log("New city created:", city); // Log newly created city
-    res.status(201).json(city);
-  } catch (error) {
-    console.error("Error creating city:", error); // Log the error
-    res.status(500).json({ message: error.message });
-  }
+      if (city) {
+        console.log("City already exists:", city); // Log the existing city if found
+        return res.status(400).json({ message: "City already exists" });
+      }
+
+      city = new City({ name: normalizedCity });
+      await city.save();
+
+      console.log("City created successfully:", city); // Log the newly created city
+      res.status(201).json(city);
+    } catch (error) {
+      console.error("Error creating city:", error.message); // Log the error message here
+      res.status(500).json({ message: "Failed to create city", error: error.message });
+    }
 });
 
 module.exports = router;
