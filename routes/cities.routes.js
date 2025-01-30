@@ -4,33 +4,26 @@ const City = require("../models/City.model"); // Assuming this is the model for 
 
 // POST route to create a city
 router.post("/", async (req, res) => {
-  console.log(req.body); // Logs the request body to the console to check if it's being sent correctly
-
-  const { name } = req.body;
-
-  // Check if name exists in the request body
-  if (!name) {
-    return res.status(400).json({ message: "City name is required" });
-  }
-
   try {
-    // Check if the city already exists
-    const existingCity = await City.findOne({ name });
-    if (existingCity) {
-      return res.status(400).json({ message: "City already exists" });
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: "City name is required." });
     }
 
-    // Create and save the new city
-    const city = new City({ name });
-    await city.save(); // Save city to the database
+    // Check if city exists before creating
+    const existingCity = await City.findOne({ name });
+    if (existingCity) {
+      return res.status(400).json({ message: "City already exists." });
+    }
 
-    // Respond with the created city
-    res.status(201).json(city);
-  } catch (error) {
-    console.error("Error creating city:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to create city", error: error.message });
+    const city = new City({ name });
+    await city.save();
+
+    res.status(201).json(city); // Send back the created city
+  } catch (err) {
+    console.error("Error creating city:", err);
+    res.status(500).json({ message: "Internal server error." });
   }
 });
 
