@@ -8,37 +8,38 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   const { skill, user, city } = req.body;
 
-  console.log("🔍 Received data:", req.body); // Log request body for debugging
-
-  // Check if all required fields are provided
-  if (!skill || !user || !city) {
-    return res.status(400).json({ message: 'Missing required fields: skill, user, or city' });
-  }
-
   try {
     // Find the user by username
     const userObj = await User.findOne({ username: user });
     if (!userObj) {
-      return res.status(400).json({ message: `User '${user}' not found` });
+      return res.status(400).json({ message: 'User does not exist' });
     }
 
-    // Find the city by name
-    const cityObj = await City.findOne({ city: city });
+    // Find or create the city
+    let cityObj = await City.findOne({ city: city });
     if (!cityObj) {
-      return res.status(400).json({ message: `City '${city}' not found` });
+      cityObj = new City({ city: city });
+      await cityObj.save();
+    }
+
+    // Check if the skill already exists for this user in this city
+    const existingSkill = await Skill.findOne({ skill, user: userObj._id, city: cityObj._id });
+    if (existingSkill) {
+      return res.status(400).json({ message: 'This skill already exists for this user in this city' });
     }
 
     // Create the new skill document
     const newSkill = new Skill({
       skill,
-      user: userObj._id, // Use the ObjectId of the user
-      city: cityObj._id, // Use the ObjectId of the city
+      user: userObj._id,
+      city: cityObj._id,
     });
 
     await newSkill.save(); // Save the new skill to the database
     res.status(201).json(newSkill); // Respond with the new skill
+
   } catch (error) {
-    console.error("❌ Error:", error);
+    console.error(error);
     res.status(500).json({ message: error.message }); // Handle errors
   }
 });
@@ -49,7 +50,7 @@ router.get('/', async (req, res) => {
     const skills = await Skill.find().populate('user city'); // Populate user and city if needed
     res.status(200).json(skills);
   } catch (error) {
-    console.error("❌ Error fetching skills:", error);
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 });
