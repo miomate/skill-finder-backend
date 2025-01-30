@@ -4,12 +4,12 @@ const User = require('../models/User.model');
 const City = require('../models/City.model');
 const router = express.Router();
 
-// POST /api/skills
+// POST /api/skills - Create a new skill
 router.post('/', async (req, res) => {
   const { skill, user, city } = req.body;
 
   try {
-    // Find the user and city by name (this can be adjusted based on your data models)
+    // Find the user and city by name (adjust if needed)
     const userObj = await User.findOne({ username: user });
     const cityObj = await City.findOne({ city: city });
 
@@ -30,6 +30,17 @@ router.post('/', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message }); // Handle errors
+  }
+});
+
+// GET /api/skills - Fetch all skills
+router.get('/', async (req, res) => {
+  try {
+    const skills = await Skill.find().populate('user city'); // Populate user and city if needed
+    res.status(200).json(skills);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 });
 
