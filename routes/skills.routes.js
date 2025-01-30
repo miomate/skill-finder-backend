@@ -1,13 +1,24 @@
 const express = require("express");
 const router = express.Router();
-const Skill = require("../models/Skill.model"); // Assuming this is your skill model
+const Skill = require("../models/Skill.model");
 
-// POST route to create a skill
+// GET route to fetch all skills
+router.get("/", async (req, res) => {
+  try {
+    const skills = await Skill.find().populate("user city");
+    res.json(skills);
+  } catch (error) {
+    console.error("Error fetching skills:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+// POST route to create a new skill
 router.post("/", async (req, res) => {
   try {
     const { skill, user, city } = req.body;
 
-    console.log("Received skill data:", { skill, user, city }); // Log received data
+    console.log("Received skill data:", { skill, user, city });
 
     if (!skill || !user || !city) {
       console.error("Missing required fields");
@@ -16,7 +27,7 @@ router.post("/", async (req, res) => {
         .json({ message: "Skill, user, and city are required." });
     }
 
-    // Check if skill already exists for the user and city
+    // Check if the skill already exists for the user and city
     const existingSkill = await Skill.findOne({ skill, user, city });
     if (existingSkill) {
       console.error("Skill already exists:", skill);
@@ -25,11 +36,12 @@ router.post("/", async (req, res) => {
         .json({ message: "Skill already exists for this user in this city." });
     }
 
+    // Create and save the new skill
     const newSkill = new Skill({ skill, user, city });
     await newSkill.save();
 
     console.log("Skill created successfully:", newSkill);
-    res.status(201).json(newSkill); // Send back the created skill
+    res.status(201).json(newSkill);
   } catch (err) {
     console.error("Error creating skill:", err);
     res.status(500).json({ message: "Internal server error." });
@@ -37,6 +49,46 @@ router.post("/", async (req, res) => {
 });
 
 module.exports = router;
+
+// const express = require("express");
+// const router = express.Router();
+// const Skill = require("../models/Skill.model"); // Assuming this is your skill model
+
+// // POST route to create a skill
+// router.post("/", async (req, res) => {
+//   try {
+//     const { skill, user, city } = req.body;
+
+//     console.log("Received skill data:", { skill, user, city }); // Log received data
+
+//     if (!skill || !user || !city) {
+//       console.error("Missing required fields");
+//       return res
+//         .status(400)
+//         .json({ message: "Skill, user, and city are required." });
+//     }
+
+//     // Check if skill already exists for the user and city
+//     const existingSkill = await Skill.findOne({ skill, user, city });
+//     if (existingSkill) {
+//       console.error("Skill already exists:", skill);
+//       return res
+//         .status(400)
+//         .json({ message: "Skill already exists for this user in this city." });
+//     }
+
+//     const newSkill = new Skill({ skill, user, city });
+//     await newSkill.save();
+
+//     console.log("Skill created successfully:", newSkill);
+//     res.status(201).json(newSkill); // Send back the created skill
+//   } catch (err) {
+//     console.error("Error creating skill:", err);
+//     res.status(500).json({ message: "Internal server error." });
+//   }
+// });
+
+// module.exports = router;
 
 // const express = require("express");
 // const router = express.Router();
