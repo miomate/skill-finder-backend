@@ -9,11 +9,14 @@ router.post("/", async (req, res) => {
   const { name } = req.body;
 
   try {
+    console.log("Received city name:", name);  // Log to check if city name is coming through
+
     // Check if the city already exists
     let city = await City.findOne({ name });
 
     // If the city does not exist, create it
     if (!city) {
+      console.log("City not found, creating a new one.");
       city = new City({ name });
       await city.save();
     }
@@ -21,7 +24,8 @@ router.post("/", async (req, res) => {
     // Respond with the city (either newly created or already existing)
     res.status(200).json(city);
   } catch (error) {
-    res.status(500).json({ message: "Error creating or fetching city" });
+    console.error("Error creating city:", error);  // Log the error to the server
+    res.status(500).json({ message: "Error creating or fetching city", error: error.message });
   }
 });
 
@@ -36,11 +40,14 @@ router.get("/", async (req, res) => {
     }
     res.status(200).json(foundCity);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching city" });
+    console.error("Error fetching city:", error);  // Log the error to the server
+    res.status(500).json({ message: "Error fetching city", error: error.message });
   }
 });
 
 module.exports = router;
+
+
 
 // const express = require("express");
 // const City = require("../models/City.model");
