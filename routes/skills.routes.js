@@ -1,56 +1,54 @@
-const express = require('express');
-const Skill = require('../models/Skill.model');
-const User = require('../models/User.model');
-const City = require('../models/City.model');
+const express = require("express");
+const Skill = require("../models/Skill.model");
+const User = require("../models/User.model");
+const City = require("../models/City.model");
+
 const router = express.Router();
 
-// POST /api/skills - Create a new skill
-router.post('/', async (req, res) => {
+// POST /skills - Add a new skill
+router.post("/", async (req, res) => {
   const { skill, user, city } = req.body;
 
   try {
-    // Find the user by username
-    const userObj = await User.findOne({ username: user });
+    if (!skill || !user || !city) {
+      return res.status(400).json({ message: "Skill, user, and city are required" });
+    }
+
+    // Find user by ID
+    const userObj = await User.findById(user);
     if (!userObj) {
-      return res.status(400).json({ message: 'User does not exist' });
+      return res.status(400).json({ message: "User does not exist" });
     }
 
     // Find or create the city
-    let cityObj = await City.findOne({ city: city });
+    let cityObj = await City.findOne({ name: city });
     if (!cityObj) {
-      cityObj = new City({ city: city });
+      cityObj = new City({ name: city });
       await cityObj.save();
     }
 
     // Check if the skill already exists for this user in this city
     const existingSkill = await Skill.findOne({ skill, user: userObj._id, city: cityObj._id });
     if (existingSkill) {
-      return res.status(400).json({ message: 'This skill already exists for this user in this city' });
+      return res.status(400).json({ message: "This skill already exists for this user in this city" });
     }
 
-    // Create the new skill document
-    const newSkill = new Skill({
-      skill,
-      user: userObj._id,
-      city: cityObj._id,
-    });
+    // Create and save the new skill
+    const newSkill = new Skill({ skill, user: userObj._id, city: cityObj._id });
+    await newSkill.save();
 
-    await newSkill.save(); // Save the new skill to the database
-    res.status(201).json(newSkill); // Respond with the new skill
-
+    res.status(201).json(newSkill);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message }); // Handle errors
+    res.status(500).json({ message: error.message });
   }
 });
 
-// GET /api/skills - Fetch all skills
-router.get('/', async (req, res) => {
+// GET /skills - Fetch all skills
+router.get("/", async (req, res) => {
   try {
-    const skills = await Skill.find().populate('user city'); // Populate user and city if needed
+    const skills = await Skill.find().populate("user city");
     res.status(200).json(skills);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: error.message });
   }
 });

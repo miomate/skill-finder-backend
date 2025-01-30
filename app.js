@@ -38,8 +38,8 @@ app.use('/api/skills', skillRoutes);
 // Add new routes for users and cities
 const usersRoutes = require('./routes/users.routes'); // Add this
 const citiesRoutes = require('./routes/cities.routes'); // Add this
-app.use('/api', usersRoutes); // Add this
-app.use('/api', citiesRoutes); // Add this
+app.use('/api/users', usersRoutes); 
+app.use('/api/cities', citiesRoutes);
 
 // ❗ Handle errors
 require('./error-handling')(app);
