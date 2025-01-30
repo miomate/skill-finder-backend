@@ -8,13 +8,24 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   const { skill, user, city } = req.body;
 
-  try {
-    // Find the user and city by name (adjust if needed)
-    const userObj = await User.findOne({ username: user });
-    const cityObj = await City.findOne({ city: city });
+  console.log("🔍 Received data:", req.body); // Log request body for debugging
 
-    if (!userObj || !cityObj) {
-      return res.status(400).json({ message: 'Invalid user or city' });
+  // Check if all required fields are provided
+  if (!skill || !user || !city) {
+    return res.status(400).json({ message: 'Missing required fields: skill, user, or city' });
+  }
+
+  try {
+    // Find the user by username
+    const userObj = await User.findOne({ username: user });
+    if (!userObj) {
+      return res.status(400).json({ message: `User '${user}' not found` });
+    }
+
+    // Find the city by name
+    const cityObj = await City.findOne({ city: city });
+    if (!cityObj) {
+      return res.status(400).json({ message: `City '${city}' not found` });
     }
 
     // Create the new skill document
@@ -26,9 +37,8 @@ router.post('/', async (req, res) => {
 
     await newSkill.save(); // Save the new skill to the database
     res.status(201).json(newSkill); // Respond with the new skill
-
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error:", error);
     res.status(500).json({ message: error.message }); // Handle errors
   }
 });
@@ -39,7 +49,7 @@ router.get('/', async (req, res) => {
     const skills = await Skill.find().populate('user city'); // Populate user and city if needed
     res.status(200).json(skills);
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error fetching skills:", error);
     res.status(500).json({ message: error.message });
   }
 });
