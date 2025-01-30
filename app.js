@@ -12,17 +12,16 @@ const app = express();
 
 // ℹ️ Configure CORS
 const allowedOrigins = [
-    "https://glittery-empanada-71e129.netlify.app", // Your production URL
-  ];
-
-  app.use(
-    cors({
-      origin: allowedOrigins,
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      credentials: true,
-    })
-  );
+  "https://glittery-empanada-71e129.netlify.app", // Your production URL
+];
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 // Explicitly handle OPTIONS requests for CORS (for preflight)
 app.options("*", cors());
