@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const salt = bcrypt.genSaltSync(10); 
+const salt = bcrypt.genSaltSync(10);
 const hash = bcrypt.hashSync("password", salt);
 
 // ℹ️ Gets access to environment variables/settings
@@ -7,12 +7,7 @@ require('dotenv').config();
 
 // Handles HTTP requests
 const express = require('express');
-
-
-
-
 const cors = require('cors');
-
 const app = express();
 
 // ℹ️ Configure CORS
@@ -37,9 +32,14 @@ app.use('/api', indexRoutes);
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
-const skillRoutes = require("./routes/skills.routes");
-app.use("/api/skills", skillRoutes);
+const skillRoutes = require('./routes/skills.routes');
+app.use('/api/skills', skillRoutes);
 
+// Add new routes for users and cities
+const usersRoutes = require('./routes/users.routes'); // Add this
+const citiesRoutes = require('./routes/cities.routes'); // Add this
+app.use('/api', usersRoutes); // Add this
+app.use('/api', citiesRoutes); // Add this
 
 // ❗ Handle errors
 require('./error-handling')(app);
