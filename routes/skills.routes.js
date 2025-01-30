@@ -10,20 +10,24 @@ router.post("/", async (req, res) => {
   const { skill, user, city } = req.body;
 
   try {
+    // Validate input
     if (!skill || !user || !city) {
       return res.status(400).json({ message: "Skill, user, and city are required" });
     }
 
     // Find user by ID
-    const userObj = await User.findById(user);
+    const userObj = await User.findOne({ username: user });
     if (!userObj) {
       return res.status(400).json({ message: "User does not exist" });
     }
 
+    // Normalize city name to lowercase
+    const normalizedCity = city.toLowerCase();
+
     // Find or create the city
-    let cityObj = await City.findOne({ name: city });
+    let cityObj = await City.findOne({ name: { $regex: `^${normalizedCity}$`, $options: "i" } });
     if (!cityObj) {
-      cityObj = new City({ name: city });
+      cityObj = new City({ name: normalizedCity });
       await cityObj.save();
     }
 
@@ -42,15 +46,3 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-// GET /skills - Fetch all skills
-router.get("/", async (req, res) => {
-  try {
-    const skills = await Skill.find().populate("user city");
-    res.status(200).json(skills);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-module.exports = router;
