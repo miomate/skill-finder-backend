@@ -7,19 +7,24 @@ router.post("/", async (req, res) => {
   try {
     const { name } = req.body;
 
+    console.log("Received city name:", name); // Log the name received
+
     if (!name) {
+      console.error("City name is required");
       return res.status(400).json({ message: "City name is required." });
     }
 
     // Check if city exists before creating
     const existingCity = await City.findOne({ name });
     if (existingCity) {
+      console.error("City already exists:", name);
       return res.status(400).json({ message: "City already exists." });
     }
 
     const city = new City({ name });
     await city.save();
 
+    console.log("City created successfully:", city);
     res.status(201).json(city); // Send back the created city
   } catch (err) {
     console.error("Error creating city:", err);
