@@ -6,8 +6,9 @@ const skillSchema = new mongoose.Schema({
   city: { type: mongoose.Schema.Types.ObjectId, ref: "City", required: true },
 });
 
-// Create a compound index so that the combination of skill, user, and city must be unique.
-// This allows the same skill name to exist if either the user or city is different.
+// Remove any individual unique index on 'skill' and instead add a compound unique index
+// This ensures that the combination of { skill, user, city } is unique, allowing the same skill
+// to be added by the same user in different cities.
 skillSchema.index({ skill: 1, user: 1, city: 1 }, { unique: true });
 
 const Skill = mongoose.model("Skill", skillSchema);
