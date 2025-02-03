@@ -23,11 +23,24 @@ router.post("/", async (req, res) => {
 
     if (!skill || !user || !city) {
       console.error("Missing required fields");
-      return res.status(400).json({ message: "Skill, user, and city are required." });
+      return res
+        .status(400)
+        .json({ message: "Skill, user, and city are required." });
+    }
+
+    // No conversion to ObjectId here if you're already sending valid ObjectId strings.
+    // We assume 'user' and 'city' are valid ObjectId strings.
+
+    // Check if the skill already exists for this user and city
+    const existingSkill = await Skill.findOne({ skill, user, city });
+    if (existingSkill) {
+      console.error("Skill already exists for this user in this city:", skill);
+      return res
+        .status(400)
+        .json({ message: "Skill already exists for this user in this city." });
     }
 
     // Create and save the new skill
-    // We assume that 'user' and 'city' are valid ObjectId strings.
     const newSkill = new Skill({ skill, user, city });
     await newSkill.save();
 
@@ -198,8 +211,6 @@ module.exports = router;
 // });
 
 // module.exports = router;
-
-
 
 //old
 // const express = require("express");

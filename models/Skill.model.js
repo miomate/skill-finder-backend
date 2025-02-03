@@ -6,14 +6,13 @@ const skillSchema = new mongoose.Schema({
   city: { type: mongoose.Schema.Types.ObjectId, ref: "City", required: true },
 });
 
-// Create a compound unique index on { skill, user, city }
+// Remove any individual unique index on 'skill' and create a compound index on { skill, user, city }
 // This allows the same skill to be added by the same user in different cities.
 skillSchema.index({ skill: 1, user: 1, city: 1 }, { unique: true });
 
 const Skill = mongoose.model("Skill", skillSchema);
 
 module.exports = Skill;
-
 
 // const mongoose = require("mongoose");
 
