@@ -30,6 +30,8 @@ router.post("/", async (req, res) => {
     console.error("Error creating city:", err);
     res.status(500).json({ message: "Internal server error." });
   }
+
+  console.log("Received city name:", req.body.name);
 });
 
 module.exports = router;
