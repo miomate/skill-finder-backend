@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const City = require("../models/City.model"); // Assuming this is the model for cities
+const City = require("../models/City.model");
 
 // POST route to create a city
 router.post("/", async (req, res) => {
@@ -17,8 +17,9 @@ router.post("/", async (req, res) => {
 
     const existingCity = await City.findOne({ name });
     if (existingCity) {
-      console.error("City already exists:", name);
-      return res.status(400).json({ message: "City already exists." });
+      console.log("City already exists:", name);
+      // Instead of returning an error, return the existing city
+      return res.status(200).json(existingCity);
     }
 
     const city = new City({ name });
@@ -30,11 +31,47 @@ router.post("/", async (req, res) => {
     console.error("Error creating city:", err);
     res.status(500).json({ message: "Internal server error." });
   }
-
-  console.log("Received city name:", req.body.name);
 });
 
 module.exports = router;
+
+// const express = require("express");
+// const router = express.Router();
+// const City = require("../models/City.model"); // Assuming this is the model for cities
+
+// // POST route to create a city
+// router.post("/", async (req, res) => {
+//   try {
+//     const { name } = req.body;
+
+//     console.log("Received request body:", req.body); // Log entire body
+//     console.log("Received city name:", name); // Log the city name received
+
+//     if (!name) {
+//       console.error("City name is required");
+//       return res.status(400).json({ message: "City name is required." });
+//     }
+
+//     const existingCity = await City.findOne({ name });
+//     if (existingCity) {
+//       console.error("City already exists:", name);
+//       return res.status(400).json({ message: "City already exists." });
+//     }
+
+//     const city = new City({ name });
+//     await city.save();
+
+//     console.log("City created successfully:", city);
+//     res.status(201).json(city); // Send back the created city
+//   } catch (err) {
+//     console.error("Error creating city:", err);
+//     res.status(500).json({ message: "Internal server error." });
+//   }
+
+//   console.log("Received city name:", req.body.name);
+// });
+
+// module.exports = router;
 
 // const express = require("express");
 // const router = express.Router();
