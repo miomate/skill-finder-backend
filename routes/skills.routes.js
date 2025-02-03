@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Skill = require("../models/Skill.model");
 
-// GET all skills
+// GET route to fetch all skills
 router.get("/", async (req, res) => {
   try {
     const skills = await Skill.find().populate("user").populate("city");
@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST create a new skill
+// POST route to create a new skill
 router.post("/", async (req, res) => {
   try {
     const { skill, user, city } = req.body;
@@ -24,6 +24,7 @@ router.post("/", async (req, res) => {
         .json({ message: "Skill, user, and city are required." });
     }
 
+    // Check if the skill already exists for this user and city
     const existingSkill = await Skill.findOne({ skill, user, city });
     if (existingSkill) {
       return res
@@ -31,28 +32,30 @@ router.post("/", async (req, res) => {
         .json({ message: "Skill already exists for this user in this city." });
     }
 
+    // Create and save the new skill
     const newSkill = new Skill({ skill, user, city });
     await newSkill.save();
+
     res.status(201).json(newSkill);
-  } catch (error) {
-    console.error("Error creating skill:", error);
+  } catch (err) {
+    console.error("Error creating skill:", err);
     res.status(500).json({ message: "Internal server error." });
   }
 });
 
-// DELETE a skill by ID
+// DELETE route to remove a skill by ID
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedSkill = await Skill.findByIdAndDelete(id);
 
+    const deletedSkill = await Skill.findByIdAndDelete(id);
     if (!deletedSkill) {
       return res.status(404).json({ message: "Skill not found." });
     }
 
     res.status(204).json({ message: "Skill deleted successfully." });
-  } catch (error) {
-    console.error("Error deleting skill:", error);
+  } catch (err) {
+    console.error("Error deleting skill:", err);
     res.status(500).json({ message: "Internal server error." });
   }
 });
@@ -64,15 +67,16 @@ router.get("/user/:userId", async (req, res) => {
       .populate("user")
       .populate("city");
 
-    if (!userSkills.length) {
+    if (!userSkills || userSkills.length === 0) {
       return res
         .status(404)
         .json({ message: "No skills found for this user." });
     }
+
     res.json(userSkills);
   } catch (error) {
     console.error("Error fetching user skills:", error);
-    res.status(500).json({ message: "Error fetching user skills." });
+    res.status(500).json({ message: "Error fetching user skills" });
   }
 });
 
