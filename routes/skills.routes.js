@@ -72,6 +72,16 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+//
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const userSkills = await Skill.find({ user: req.params.userId });
+    res.json(userSkills);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user skills" });
+  }
+});
+
 module.exports = router;
 
 // const express = require("express");
