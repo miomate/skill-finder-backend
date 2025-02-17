@@ -1,23 +1,25 @@
 const jwt = require("jsonwebtoken");
 
 const isAuthenticated = (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-    }
+  const token = req.headers.authorization?.split(" ")[1];
 
-    try {
-        const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-        req.tokenPayload = decoded;
-        next();
-    } catch (error) {
-        res.status(401).json({ message: "Invalid token" });
-    }
+  console.log("Token received:", token); // Debugging log
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized - No Token" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+    req.tokenPayload = decoded;
+    next();
+  } catch (error) {
+    console.error("JWT Verification Error:", error.message); // Debugging log
+    res.status(401).json({ message: "Invalid token" });
+  }
 };
 
 module.exports = { isAuthenticated };
-
-
 
 //backup
 // const jwt = require("jsonwebtoken");

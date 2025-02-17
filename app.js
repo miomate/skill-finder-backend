@@ -1,35 +1,28 @@
-const bcrypt = require("bcryptjs");
-const salt = bcrypt.genSaltSync(10);
-const hash = bcrypt.hashSync("password", salt);
-
-// ℹ️ Gets access to environment variables/settings
 require("dotenv").config();
-
-// Handles HTTP requests
 const express = require("express");
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
+
 const app = express();
 
-// ℹ️ Configure CORS
-const allowedOrigins = [
-  "https://glittery-empanada-71e129.netlify.app", // Your production URL
-];
-app.use(
-  cors({
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+// CORS Configuration
+const allowedOrigins = ["https://glittery-empanada-71e129.netlify.app"];
+const corsOptions = {
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
-// Explicitly handle OPTIONS requests for CORS (for preflight)
-app.options("*", cors());
+// Middleware for parsing JSON
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ℹ️ Load middleware configurations
+// Load middleware configurations (ensure this exists)
 require("./config")(app);
 
-// 👇 Start handling routes
+// Routes
 const indexRoutes = require("./routes/index.routes");
 app.use("/api", indexRoutes);
 
@@ -39,13 +32,13 @@ app.use("/auth", authRoutes);
 const skillRoutes = require("./routes/skills.routes");
 app.use("/api/skills", skillRoutes);
 
-// Add new routes for users and cities
 const usersRoutes = require("./routes/users.routes");
-const citiesRoutes = require("./routes/cities.routes");
 app.use("/api/users", usersRoutes);
+
+const citiesRoutes = require("./routes/cities.routes");
 app.use("/api/cities", citiesRoutes);
 
-// ❗ Handle errors
+// Error handling
 require("./error-handling")(app);
 
 module.exports = app;
