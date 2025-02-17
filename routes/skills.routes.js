@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Skill = require("../models/Skill.model");
+const City = require("../models/City.model");
+const { isAuthenticated } = require("../middlewares/router-guard.middle");
 
 // GET route to fetch all skills
 router.get("/", async (req, res) => {
@@ -14,7 +16,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST route to create a new skill
-router.post("/", async (req, res) => {
+router.post("/", isAuthenticated, async (req, res) => {
   try {
     const { skill, user, city } = req.body;
 
@@ -24,8 +26,19 @@ router.post("/", async (req, res) => {
         .json({ message: "Skill, user, and city are required." });
     }
 
-    // Check if the skill already exists for this user and city
-    const existingSkill = await Skill.findOne({ skill, user, city });
+    // Find city by name and get its ObjectId
+    const cityDoc = await City.findOne({ name: city });
+
+    if (!cityDoc) {
+      return res.status(404).json({ message: "City not found." });
+    }
+
+    // Check if the skill already exists for this user in this city
+    const existingSkill = await Skill.findOne({
+      skill,
+      user,
+      city: cityDoc._id,
+    });
     if (existingSkill) {
       return res
         .status(400)
@@ -33,7 +46,7 @@ router.post("/", async (req, res) => {
     }
 
     // Create and save the new skill
-    const newSkill = new Skill({ skill, user, city });
+    const newSkill = new Skill({ skill, user, city: cityDoc._id });
     await newSkill.save();
 
     res.status(201).json(newSkill);
