@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Skill = require("../models/Skill.model");
 const City = require("../models/City.model");
-const { isAuthenticated } = require("../middlewares/router-guard.middle");
+const { isAuthenticated } = require("../middlewares/router-guard.middleware");
 
 // GET route to fetch all skills
 router.get("/", async (req, res) => {
