@@ -93,4 +93,39 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
+// PATCH route to update a skill by ID
+router.patch("/:id", isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { skill, city } = req.body;
+
+    // Check if the skill exists
+    const existingSkill = await Skill.findById(id);
+    if (!existingSkill) {
+      return res.status(404).json({ message: "Skill not found." });
+    }
+
+    // If city is updated, find the city's ObjectId
+    if (city) {
+      const cityDoc = await City.findOne({ name: city });
+      if (!cityDoc) {
+        return res.status(404).json({ message: "City not found." });
+      }
+      existingSkill.city = cityDoc._id;
+    }
+
+    // Update the skill name if provided
+    if (skill) {
+      existingSkill.skill = skill;
+    }
+
+    // Save the updated skill
+    const updatedSkill = await existingSkill.save();
+    res.json(updatedSkill);
+  } catch (err) {
+    console.error("Error updating skill:", err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
 module.exports = router;
