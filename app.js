@@ -9,7 +9,7 @@ const app = express();
 const allowedOrigins = ["https://glittery-empanada-71e129.netlify.app"];
 const corsOptions = {
   origin: allowedOrigins,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Added PATCH
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
