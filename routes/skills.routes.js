@@ -26,11 +26,11 @@ router.post("/", isAuthenticated, async (req, res) => {
         .json({ message: "Skill, user, and city are required." });
     }
 
-    // Find city by name and get its ObjectId
-    const cityDoc = await City.findOne({ name: city });
-
+    // Find or create city by name
+    let cityDoc = await City.findOne({ name: city });
     if (!cityDoc) {
-      return res.status(404).json({ message: "City not found." });
+      cityDoc = new City({ name: city });
+      await cityDoc.save();
     }
 
     // Check if the skill already exists for this user in this city
@@ -57,7 +57,7 @@ router.post("/", isAuthenticated, async (req, res) => {
 });
 
 // DELETE route to remove a skill by ID
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -105,11 +105,13 @@ router.patch("/:id", isAuthenticated, async (req, res) => {
       return res.status(404).json({ message: "Skill not found." });
     }
 
-    // If city is updated, find the city's ObjectId
+    // If city is updated, find or create the city document
     if (city) {
-      const cityDoc = await City.findOne({ name: city });
+      let cityDoc = await City.findOne({ name: city });
       if (!cityDoc) {
-        return res.status(404).json({ message: "City not found." });
+        // Create the city if it doesn't exist
+        cityDoc = new City({ name: city });
+        await cityDoc.save();
       }
       existingSkill.city = cityDoc._id;
     }
