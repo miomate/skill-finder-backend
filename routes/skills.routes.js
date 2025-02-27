@@ -81,11 +81,8 @@ router.get("/user/:userId", async (req, res) => {
       .populate("city");
 
     if (!userSkills || userSkills.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No skills found for this user." });
+      return res.json([]);
     }
-
     res.json(userSkills);
   } catch (error) {
     console.error("Error fetching user skills:", error);
